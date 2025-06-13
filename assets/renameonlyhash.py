@@ -1,7 +1,7 @@
 import os
 
 # Folder path where your files are
-folder_path = r"C:\Users\364ds\AppData\Roaming\XXMI Launcher\WWMI\Extract"
+folder_path = r"D:\WWMI\Extract"
 
 for root, dirs, files in os.walk(folder_path):
     for filename in files:

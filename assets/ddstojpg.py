@@ -47,8 +47,8 @@ def convert_dds_to_jpg(input_folder, texconv_path):
 
 if __name__ == "__main__":
     # Configuration - modify these paths
-    input_folder = r"C:\Users\364ds\AppData\Roaming\XXMI Launcher\WWMI\Extract"  # Folder containing DDS files
-    texconv_path = r"D:\Mods_GachaGames\Tools\texconv.exe"     # Path to texconv.exe
+    input_folder = r"D:\WWMI\Extract"  # Folder containing DDS files
+    texconv_path = r"from_microsoft-texconv.exe"     # Path to texconv.exe
     
     convert_dds_to_jpg(input_folder, texconv_path)
     print("Conversion process completed.")
