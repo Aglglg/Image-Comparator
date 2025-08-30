@@ -12,7 +12,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -49,9 +48,13 @@ class _MyHomePageState extends State<MyHomePage> {
     Map<File, File> imagesMatch = {};
 
     for (var image in imagesA) {
-      final result = await listCompare(target: image, list: imagesB);
-      final bestMatchIndex = getBestMatchIndex(result);
-      imagesMatch[image] = imagesB[bestMatchIndex];
+      try {
+        final result = await listCompare(target: image, list: imagesB);
+        final bestMatchIndex = getBestMatchIndex(result);
+        imagesMatch[image] = imagesB[bestMatchIndex];
+      } catch (e) {
+        print(image.path);
+      }
     }
 
     await writeImageMatchesToFile(imagesMatch);
@@ -179,7 +182,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           Expanded(
                             child: Column(
                               children: [
-                                Image.file(comparisonResults[currentIndex].key),
+                                Image.file(
+                                  comparisonResults[currentIndex].key,
+                                  height: 300,
+                                ),
                                 Text(
                                   p.basename(
                                     comparisonResults[currentIndex].key.path,
@@ -194,6 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               children: [
                                 Image.file(
                                   comparisonResults[currentIndex].value,
+                                  height: 300,
                                 ),
                                 Text(
                                   p.basename(
@@ -214,6 +221,16 @@ class _MyHomePageState extends State<MyHomePage> {
                           });
                         },
                         child: Text('Next'),
+                      ),
+                      SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            currentIndex =
+                                (currentIndex - 1) % comparisonResults.length;
+                          });
+                        },
+                        child: Text('Prev'),
                       ),
                     ],
                   ),
