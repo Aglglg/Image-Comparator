@@ -41,20 +41,43 @@ class _MyHomePageState extends State<MyHomePage> {
   int currentIndex = 0;
 
   Future<void> onCompareButtonClick() async {
-    //Get images on both folders
+    //get images from both folders recursively
     final imagesA = getImageFilesRecursively(textfieldAController.text);
     final imagesB = getImageFilesRecursively(textfieldBController.text);
 
+    //create a map of filenames for quick lookup
+    final namesA = {for (var file in imagesA) p.basename(file.path): file};
+    final namesB = {for (var file in imagesB) p.basename(file.path): file};
+
+    //find filenames that exist in both folders
+    final sameFilenames = namesA.keys.toSet().intersection(namesB.keys.toSet());
+
+    //delete duplicates from both sides
+    //(ASSUME THAT FILENAME ALREADY MODIFIED TO BE the hash, 185abc34.jpg)
+    for (var filename in sameFilenames) {
+      try {
+        await namesA[filename]?.delete();
+        await namesB[filename]?.delete();
+      } catch (_) {}
+    }
+
+    //refresh image lists after deletion
+    final filteredA = imagesA
+        .where((f) => !sameFilenames.contains(p.basename(f.path)))
+        .toList();
+    final filteredB = imagesB
+        .where((f) => !sameFilenames.contains(p.basename(f.path)))
+        .toList();
+
+    //proceed with comparison
     Map<File, File> imagesMatch = {};
 
-    for (var image in imagesA) {
+    for (var image in filteredA) {
       try {
-        final result = await listCompare(target: image, list: imagesB);
+        final result = await listCompare(target: image, list: filteredB);
         final bestMatchIndex = getBestMatchIndex(result);
-        imagesMatch[image] = imagesB[bestMatchIndex];
-      } catch (e) {
-        print(image.path);
-      }
+        imagesMatch[image] = filteredB[bestMatchIndex];
+      } catch (_) {}
     }
 
     await writeImageMatchesToFile(imagesMatch);
